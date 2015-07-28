@@ -9,10 +9,12 @@ source = ['dgbmv.pyf']
 if 'MKLROOT' in os.environ:  # Check to see if we have MKL available
     blas_lib = ['mkl_rt', 'iomp5', 'pthread', 'm']  # MKL libraries we need to link against
     blas_libdir = [os.environ['MKLROOT']+'/lib/intel64']
+    blas_runtime_lib=[]
 else:
     source += ['dgbmv.f']
     blas_lib = []
     blas_libdir = []
+    blas_runtime_lib=['/usr/lib/libblas.so.3']
 
 use_omp = True
 omp_args = ['-fopenmp'] if use_omp else []
@@ -20,7 +22,7 @@ omp_args = ['-fopenmp'] if use_omp else []
 dgbmv_ext = Extension('dgbmv', source,
                       library_dirs=blas_libdir, libraries=blas_lib,
                       extra_compile_args=omp_args,
-                      extra_link_args=omp_args)
+                      extra_link_args=blas_runtime_lib+omp_args)
 
 setup(
     name='pfb-inverse',
